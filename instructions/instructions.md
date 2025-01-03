@@ -20,10 +20,10 @@ Users can sign up and log in with email/password using Supabase Auth.
 - Account Settings:
 Manage user profiles, update passwords, and configure preferences.
 Display subscription details and integrate billing management via Lemon Squeezy.
-## 2. Project and Business Management
+## 2. Project and Business (Projects) Management
 - Business Profiles:
-Allow users to create, name, and manage multiple business profiles.
-Users can associate projects and feedback with specific businesses.
+Allow users to create, name, and manage multiple business (Projects).
+Users can associate feedback with specific businesses (Projects).
 - Script Generation:
 Automatically generate a unique embed script for each business/project to integrate the feedback widget on external websites.
 ## 3. Feedback Widget Creation
