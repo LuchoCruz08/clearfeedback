@@ -70,7 +70,7 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: Promise<{ id: string }>; // Change here to match the expected type
+  params: { id: string }; // Adjust to match Next.js expectations
   searchParams?: Record<string, string | string[] | undefined>;
 }
 
@@ -100,7 +100,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("id", (await params).id)
+        .eq("id", params.id)
         .single();
 
       if (error) throw error;
@@ -120,7 +120,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("feedback")
         .select("*")
-        .eq("business_id", (await params).id)
+        .eq("business_id", params.id)
         .order("submitted_at", { ascending: false });
 
       if (error) throw error;
@@ -141,7 +141,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data: widget, error } = await supabase
         .from("widget")
         .select("*")
-        .eq("business_id", (await params).id)
+        .eq("business_id", params.id)
         .maybeSingle();
 
       if (error && error.code !== "PGRST116") throw error;
@@ -156,7 +156,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { error } = await supabase
         .from("businesses")
         .delete()
-        .eq("id", (await params).id);
+        .eq("id", params.id);
 
       if (error) throw error;
 
@@ -211,7 +211,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
     script.src = '${process.env.NEXT_PUBLIC_APP_URL}/api/widget';
     script.async = true;
     script.onload = function() {
-      window.FeedbackWidget.init('${(await params).id}');
+      window.FeedbackWidget.init('${params.id}');
     };
     document.head.appendChild(script);
   })();
