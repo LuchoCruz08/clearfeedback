@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -38,9 +39,12 @@ import {
   Check,
   Copy,
   Code,
+  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 
 interface Project {
   id: string;
@@ -71,6 +75,7 @@ export default function ProjectDetailsPage({
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hasWidget, setHasWidget] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const supabase = createClient();
@@ -78,6 +83,11 @@ export default function ProjectDetailsPage({
   useEffect(() => {
     fetchProjectDetails();
     fetchFeedback();
+    fetchWidgetConfig().then((widget) => {
+      if (widget) {
+        setHasWidget(true);
+      }
+    });
   }, []);
 
   async function fetchProjectDetails() {
@@ -118,6 +128,21 @@ export default function ProjectDetailsPage({
       });
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchWidgetConfig() {
+    try {
+      const { data: widget, error } = await supabase
+        .from("widget")
+        .select("*")
+        .eq("business_id", params.id)
+        .maybeSingle();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return widget;
+    } catch (error) {
+      return null;
     }
   }
 
@@ -178,17 +203,15 @@ export default function ProjectDetailsPage({
 
   function getEmbedScript() {
     return `<script>
-  (function(w,d,s,o,f,js,fjs){
-    w['FeedbackWidget']=o;
-    w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
-    js=d.createElement(s),fjs=d.getElementsByTagName(s)[0];
-    js.id='feedback-widget';
-    js.src=f;
-    js.async=1;
-    fjs.parentNode.insertBefore(js,fjs);
-  }(window,document,'script','fb','https://your-domain.com/widget.js'));
-  
-  fb('init', '${params.id}');
+  (function() {
+    const script = document.createElement('script');
+    script.src = '${process.env.NEXT_PUBLIC_APP_URL}/api/widget';
+    script.async = true;
+    script.onload = function() {
+      window.FeedbackWidget.init('${params.id}');
+    };
+    document.head.appendChild(script);
+  })();
 </script>`;
   }
 
@@ -318,50 +341,83 @@ export default function ProjectDetailsPage({
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Embed Script</CardTitle>
+      {!hasWidget ? (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Widget Configuration Found</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>This project doesn't have a widget configured yet.</span>
             <Button
-              onClick={copyToClipboard}
               variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
+              onClick={() => router.push("/dashboard/widget")}
             >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4" />
-                  Copy Script
-                </>
-              )}
+              Configure Widget
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <pre className="overflow-x-auto rounded-lg bg-muted p-4 font-mono text-sm">
-              {getEmbedScript()}
-            </pre>
-            <div className="absolute right-2 top-2">
-              <Code className="h-4 w-4 text-muted-foreground" />
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Embed Script</CardTitle>
+              <Button
+                onClick={copyToClipboard}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy Script
+                  </>
+                )}
+              </Button>
             </div>
-          </div>
-          <div className="mt-4 space-y-2">
-            <h4 className="font-medium">Installation Steps:</h4>
-            <ol className="list-decimal space-y-2 pl-4 text-sm text-muted-foreground">
-              <li>Copy the script above</li>
-              <li>Paste it just before the closing &lt;/body&gt; tag of your website</li>
-              <li>The feedback widget will appear automatically on your site</li>
-              <li>Customize the widget appearance in the Widget Settings section</li>
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
+            <CardDescription>
+              Add this script to your website to start collecting feedback.{" "}
+              <Link
+                href="/documentation"
+                className="text-primary hover:underline"
+              >
+                View documentation
+              </Link>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <pre className="overflow-x-auto rounded-lg bg-muted p-4 font-mono text-sm">
+                {getEmbedScript()}
+              </pre>
+              <div className="absolute right-2 top-2">
+                <Code className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <h4 className="font-medium">Quick Installation Steps:</h4>
+              <ol className="list-decimal space-y-2 pl-4 text-sm text-muted-foreground">
+                <li>Copy the script above</li>
+                <li>Paste it just before the closing &lt;/body&gt; tag of your website</li>
+                <li>The feedback widget will appear automatically on your site</li>
+                <li>
+                  For detailed instructions, check our{" "}
+                  <Link
+                    href="/documentation"
+                    className="text-primary hover:underline"
+                  >
+                    documentation
+                  </Link>
+                </li>
+              </ol>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

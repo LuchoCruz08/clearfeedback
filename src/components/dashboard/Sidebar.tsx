@@ -4,8 +4,6 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Settings,
-  MessageSquare,
-  BarChart3,
   Code2,
 } from "lucide-react";
 import Link from "next/link";
@@ -13,8 +11,6 @@ import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Feedback", href: "/dashboard/feedback", icon: MessageSquare },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Widget", href: "/dashboard/widget", icon: Code2 },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
