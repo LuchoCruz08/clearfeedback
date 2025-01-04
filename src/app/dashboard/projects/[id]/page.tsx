@@ -65,13 +65,15 @@ interface Feedback {
   };
 }
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
+type PageParams = {
+  id: string;
+};
 
-export default function ProjectDetailsPage({ params }: PageProps) {
+export default function ProjectDetailsPage({
+  params,
+}: {
+  params: PageParams;
+}) {
   const [project, setProject] = useState<Project | null>(null);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
