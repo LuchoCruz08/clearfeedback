@@ -2,15 +2,16 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteContext {
+// Use the correct type for dynamic route parameters
+type Props = {
   params: {
     id: string;
   };
-}
+};
 
 export async function GET(
-  req: NextRequest,
-  { params }: RouteContext
+  request: NextRequest,
+  { params }: Props
 ) {
   try {
     const supabase = await createClient();
