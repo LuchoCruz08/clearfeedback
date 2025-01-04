@@ -70,7 +70,8 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>; // Change here to match the expected type
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 export default function ProjectDetailsPage({ params }: PageProps) {
@@ -99,7 +100,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", (await params).id)
         .single();
 
       if (error) throw error;
@@ -119,7 +120,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("feedback")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", (await params).id)
         .order("submitted_at", { ascending: false });
 
       if (error) throw error;
@@ -140,7 +141,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data: widget, error } = await supabase
         .from("widget")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", (await params).id)
         .maybeSingle();
 
       if (error && error.code !== "PGRST116") throw error;
@@ -155,7 +156,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { error } = await supabase
         .from("businesses")
         .delete()
-        .eq("id", params.id);
+        .eq("id", (await params).id);
 
       if (error) throw error;
 
@@ -203,14 +204,14 @@ export default function ProjectDetailsPage({ params }: PageProps) {
     feedback.reduce((acc, f) => acc + (f.metadata?.rating || 0), 0) /
       feedback.length || 0;
 
-  function getEmbedScript() {
+  async function getEmbedScript() {
     return `<script>
   (function() {
     const script = document.createElement('script');
     script.src = '${process.env.NEXT_PUBLIC_APP_URL}/api/widget';
     script.async = true;
     script.onload = function() {
-      window.FeedbackWidget.init('${params.id}');
+      window.FeedbackWidget.init('${(await params).id}');
     };
     document.head.appendChild(script);
   })();
@@ -219,7 +220,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
 
   async function copyToClipboard() {
     try {
-      await navigator.clipboard.writeText(getEmbedScript());
+      await navigator.clipboard.writeText(await getEmbedScript());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       toast({
