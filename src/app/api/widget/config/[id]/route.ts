@@ -2,16 +2,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// Update the type definition for params
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { id: string } }
 ) {
   try {
     const supabase = await createClient();
@@ -20,13 +13,13 @@ export async function GET(
     const { data: widget, error } = await supabase
       .from("widget")
       .select("*")
-      .eq("business_id", params.id)
+      .eq("business_id", context.params.id)
       .maybeSingle();
 
     // If no widget exists, return default configuration
     if (!widget) {
       return NextResponse.json({
-        business_id: params.id,
+        business_id: context.params.id,
         position: "bottom-right",
         theme: "light",
         custom_css: "",
@@ -34,7 +27,7 @@ export async function GET(
         questions: [],
         show_emoji: true,
         show_rating: true,
-        rating_scale: 0,
+        rating_scale: 5,
         button_text: "Give Feedback",
         title_text: "Share Your Feedback",
       });
