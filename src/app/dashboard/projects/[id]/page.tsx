@@ -67,11 +67,12 @@ interface Feedback {
 
 interface PageProps {
   params: Promise<{ id: string }>;
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default function ProjectDetailsPage({ params, searchParams }: PageProps) {
   const { id } = use(params);
+  const searchParamsData = use(searchParams);
   const [project, setProject] = useState<Project | null>(null);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
