@@ -302,11 +302,11 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
       </div>
 
       {!project?.website_url && (
-        <Alert className="mb-4">
+        <Alert>
           <AlertTitle>Website URL Not Set</AlertTitle>
           <AlertDescription className="flex items-center justify-between">
             <span>
-              You haven't set a website URL for this project yet. This won't affect the widget's functionality.
+              You can add a website URL later. The feedback widget will work on any webpage where you add the script.
             </span>
             <Button
               variant="outline"
@@ -420,7 +420,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
               </Button>
             </div>
             <CardDescription>
-              Add this script to your website to start collecting feedback. The widget will work on any webpage where you add this script, regardless of the domain.{" "}
+              Add this script to any webpage where you want to collect feedback. The widget will work regardless of the domain.{" "}
               <Link
                 href="/documentation"
                 className="text-primary hover:underline"

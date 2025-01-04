@@ -83,7 +83,7 @@ export default function DashboardPage() {
           {
             user_id: user.id,
             name: projectName,
-            website_url: websiteUrl,
+            website_url: websiteUrl || null,
           },
         ])
         .select()
