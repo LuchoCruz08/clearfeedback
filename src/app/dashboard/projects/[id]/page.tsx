@@ -65,14 +65,12 @@ interface Feedback {
   };
 }
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams?: Record<string, string | string[] | undefined>;
-}
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default function ProjectDetailsPage({ params, searchParams }: PageProps) {
+export default function ProjectDetailsPage({ params, searchParams }: Props) {
   const [project, setProject] = useState<Project | null>(null);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,10 +197,8 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
   }
 
   const averageRating =
-    feedback.reduce(
-      (acc, f) => acc + (f.metadata?.rating || 0),
-      0
-    ) / feedback.length || 0;
+    feedback.reduce((acc, f) => acc + (f.metadata?.rating || 0), 0) /
+      feedback.length || 0;
 
   function getEmbedScript() {
     return `<script>
@@ -275,10 +271,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteProject}
-              >
+              <Button variant="destructive" onClick={handleDeleteProject}>
                 Delete Project
               </Button>
             </DialogFooter>
@@ -291,12 +284,13 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
           <AlertTitle>Website URL Not Set</AlertTitle>
           <AlertDescription className="flex items-center justify-between">
             <span>
-              You haven't set a website URL for this project yet. This won't affect the widget's functionality.
+              You haven't set a website URL for this project yet. This won't
+              affect the widget's functionality.
             </span>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleEditClick(project?.id ?? '')}
+              onClick={() => handleEditClick(project?.id ?? "")}
             >
               Add URL
             </Button>
@@ -325,9 +319,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {averageRating.toFixed(1)}
-            </div>
+            <div className="text-2xl font-bold">{averageRating.toFixed(1)}</div>
           </CardContent>
         </Card>
 
@@ -347,9 +339,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Last 7 Days
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Last 7 Days</CardTitle>
             <LineChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -405,7 +395,9 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
               </Button>
             </div>
             <CardDescription>
-              Add this script to your website to start collecting feedback. The widget will work on any webpage where you add this script, regardless of the domain.{" "}
+              Add this script to your website to start collecting feedback. The
+              widget will work on any webpage where you add this script,
+              regardless of the domain.{" "}
               <Link
                 href="/documentation"
                 className="text-primary hover:underline"
@@ -427,8 +419,13 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
               <h4 className="font-medium">Quick Installation Steps:</h4>
               <ol className="list-decimal space-y-2 pl-4 text-sm text-muted-foreground">
                 <li>Copy the script above</li>
-                <li>Paste it just before the closing &lt;/body&gt; tag of your website</li>
-                <li>The feedback widget will appear automatically on your site</li>
+                <li>
+                  Paste it just before the closing &lt;/body&gt; tag of your
+                  website
+                </li>
+                <li>
+                  The feedback widget will appear automatically on your site
+                </li>
                 <li>
                   For detailed instructions, check our{" "}
                   <Link
@@ -498,4 +495,4 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
       </Card>
     </div>
   );
-} 
+}
