@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   const script = `
@@ -327,6 +328,19 @@ export async function GET() {
     headers: {
       "Content-Type": "application/javascript",
       "Cache-Control": "public, max-age=3600",
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 } 

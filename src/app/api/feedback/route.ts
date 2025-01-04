@@ -60,7 +60,14 @@ export async function POST(req: NextRequest) {
 
       if (!insertError) {
         // Successfully inserted
-        return NextResponse.json({ success: true });
+        return new NextResponse(JSON.stringify({ success: true }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        });
       }
 
       error = insertError;
@@ -72,25 +79,60 @@ export async function POST(req: NextRequest) {
 
     // If we get here, all retries failed
     console.error("Failed to submit feedback after retries:", error);
-    return NextResponse.json(
-      { error: "Failed to submit feedback after multiple attempts" },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to submit feedback after multiple attempts" }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      }
     );
 
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Validation error
-      return NextResponse.json(
-        { error: "Invalid feedback data", details: error.errors },
-        { status: 400 }
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid feedback data", details: error.errors }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        }
       );
     }
 
     // Unknown error
     console.error("Error processing feedback:", error);
-    return NextResponse.json(
-      { error: "Failed to process feedback" },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to process feedback" }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      }
     );
   }
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 } 
