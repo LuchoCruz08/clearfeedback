@@ -16,3 +16,5 @@ Una vez que se haya probado, realizar el deploy de la aplicación
 y probar que las funcionalidades funcionan correctamente.
 
 Implementar la gestión de suscripciones para los usuarios.
+----------------------------------------------------------------------------------
+Problemas con el deploy de prueba.

@@ -42,7 +42,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 
@@ -66,13 +66,12 @@ interface Feedback {
 }
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
   searchParams?: Record<string, string | string[] | undefined>;
 }
 
 export default function ProjectDetailsPage({ params, searchParams }: PageProps) {
+  const { id } = use(params);
   const [project, setProject] = useState<Project | null>(null);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,21 +83,31 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
   const supabase = createClient();
 
   useEffect(() => {
-    fetchProjectDetails();
-    fetchFeedback();
-    fetchWidgetConfig().then((widget) => {
-      if (widget) {
-        setHasWidget(true);
+    async function fetchData() {
+      setLoading(true);
+      try {
+        await fetchProjectDetails();
+        await fetchFeedback();
+        const widget = await fetchWidgetConfig();
+        if (widget) {
+          setHasWidget(true);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
-    });
-  }, []);
+    }
+
+    fetchData();
+  }, [id]);
 
   async function fetchProjectDetails() {
     try {
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .single();
 
       if (error) throw error;
@@ -118,7 +127,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
       const { data, error } = await supabase
         .from("feedback")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", id)
         .order("submitted_at", { ascending: false });
 
       if (error) throw error;
@@ -139,7 +148,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
       const { data: widget, error } = await supabase
         .from("widget")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", id)
         .maybeSingle();
 
       if (error && error.code !== "PGRST116") throw error;
@@ -154,7 +163,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
       const { error } = await supabase
         .from("businesses")
         .delete()
-        .eq("id", params.id);
+        .eq("id", id);
 
       if (error) throw error;
 
@@ -211,7 +220,7 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
     script.src = '${process.env.NEXT_PUBLIC_APP_URL}/api/widget';
     script.async = true;
     script.onload = function() {
-      window.FeedbackWidget.init('${params.id}');
+      window.FeedbackWidget.init('${id}');
     };
     document.head.appendChild(script);
   })();
