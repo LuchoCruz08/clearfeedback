@@ -25,6 +25,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WidgetPreview from "@/components/widget/WidgetPreview";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -71,6 +72,8 @@ export default function WidgetPage() {
   });
   const { toast } = useToast();
   const supabase = createClient();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -138,6 +141,8 @@ export default function WidgetPage() {
 
   async function saveWidget() {
     try {
+      setIsSubmitting(true);
+      
       const { error } = await supabase
         .from("widget")
         .upsert({
@@ -151,12 +156,17 @@ export default function WidgetPage() {
         title: "Success",
         description: "Widget configuration saved successfully",
       });
+
+      router.push(`/dashboard/projects/${selectedProject}`);
     } catch (error) {
+      console.error('Error saving widget:', error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to save widget configuration",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -458,8 +468,12 @@ export default function WidgetPage() {
         )}
 
         {selectedProject && (
-          <Button onClick={saveWidget} className="w-full">
-            Save Widget Configuration
+          <Button 
+            onClick={saveWidget} 
+            className="w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Save Widget Configuration"}
           </Button>
         )}
       </div>
