@@ -204,7 +204,7 @@ export default function DashboardPage() {
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
               <DialogDescription>
-                Add a new project to collect feedback from your users.
+                Add a new project to start collecting feedback from your users.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -214,15 +214,23 @@ export default function DashboardPage() {
                   id="name"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="My Project"
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="url">Website URL</Label>
+                <Label htmlFor="url">
+                  Website URL <span className="text-sm text-muted-foreground">(optional)</span>
+                </Label>
                 <Input
                   id="url"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
+                  placeholder="https://example.com"
                 />
+                <p className="text-sm text-muted-foreground mt-1">
+                  You can add or update this later when your website is ready.
+                </p>
               </div>
             </div>
             <DialogFooter>

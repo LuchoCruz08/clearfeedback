@@ -237,6 +237,10 @@ export default function ProjectDetailsPage({
     return <div>Loading...</div>;
   }
 
+  function handleEditClick(id: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -278,6 +282,24 @@ export default function ProjectDetailsPage({
           </DialogContent>
         </Dialog>
       </div>
+
+      {!project?.website_url && (
+        <Alert className="mb-4">
+          <AlertTitle>Website URL Not Set</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>
+              You haven't set a website URL for this project yet. This won't affect the widget's functionality.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEditClick(project?.id ?? '')}
+            >
+              Add URL
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -380,7 +402,7 @@ export default function ProjectDetailsPage({
               </Button>
             </div>
             <CardDescription>
-              Add this script to your website to start collecting feedback.{" "}
+              Add this script to your website to start collecting feedback. The widget will work on any webpage where you add this script, regardless of the domain.{" "}
               <Link
                 href="/documentation"
                 className="text-primary hover:underline"
