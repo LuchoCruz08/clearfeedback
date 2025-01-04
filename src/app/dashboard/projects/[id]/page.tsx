@@ -146,15 +146,20 @@ export default function ProjectDetailsPage({ params, searchParams }: PageProps) 
 
   async function fetchWidgetConfig() {
     try {
+      console.log('Fetching widget config for project:', id);
+      
       const { data: widget, error } = await supabase
         .from("widget")
         .select("*")
         .eq("business_id", id)
         .maybeSingle();
 
+      console.log('Widget config fetched:', widget);
+
       if (error && error.code !== "PGRST116") throw error;
       return widget;
     } catch (error) {
+      console.error('Error fetching widget config:', error);
       return null;
     }
   }

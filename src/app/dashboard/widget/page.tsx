@@ -142,15 +142,20 @@ export default function WidgetPage() {
   async function saveWidget() {
     try {
       setIsSubmitting(true);
+      console.log('Saving widget with config:', config);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("widget")
         .upsert({
           ...config,
           business_id: selectedProject,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      console.log('Widget saved successfully:', data);
 
       toast({
         title: "Success",
