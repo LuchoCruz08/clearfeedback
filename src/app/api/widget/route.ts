@@ -5,20 +5,24 @@ export async function GET() {
   const script = `
     (function() {
       const WIDGET_BASE_URL = '${process.env.NEXT_PUBLIC_APP_URL}';
-      const RETRY_DELAYS = [2000, 5000, 10000]; // Retry delays in milliseconds
+      console.log('Widget initializing, base URL:', WIDGET_BASE_URL); // Debug log
 
       class FeedbackWidget {
         constructor() {
           this.config = null;
           this.widgetElement = null;
           this.modalElement = null;
+          console.log('FeedbackWidget instance created'); // Debug log
         }
 
         async init(widgetId) {
           try {
+            console.log('Initializing widget with ID:', widgetId); // Debug log
+            
             // Fetch widget configuration
             const response = await fetch(\`\${WIDGET_BASE_URL}/api/widget/config/\${widgetId}\`);
             this.config = await response.json();
+            console.log('Widget config loaded:', this.config); // Debug log
             
             // Initialize widget after getting config
             this.injectStyles();
@@ -29,10 +33,15 @@ export async function GET() {
         }
 
         injectStyles() {
+          console.log('Injecting styles with config:', this.config); // Debug log
           const styles = \`
             .feedback-widget-trigger {
               position: fixed;
-              \${this.config?.position || 'bottom: 20px; right: 20px;'}
+              \${this.config?.position === 'bottom-right' ? 'bottom: 20px; right: 20px;' : 
+                this.config?.position === 'bottom-left' ? 'bottom: 20px; left: 20px;' :
+                this.config?.position === 'top-right' ? 'top: 20px; right: 20px;' :
+                this.config?.position === 'top-left' ? 'top: 20px; left: 20px;' :
+                'bottom: 20px; right: 20px;'}
               background: \${this.config?.theme === 'dark' ? '#1f2937' : '#ffffff'};
               border-radius: 8px;
               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -65,49 +74,29 @@ export async function GET() {
               background: rgba(0, 0, 0, 0.5);
               z-index: 9999;
             }
-
-            .feedback-widget-button {
-              background: #4f46e5;
-              color: white;
-              border: none;
-              padding: 8px 16px;
-              border-radius: 4px;
-              cursor: pointer;
-              transition: background-color 0.2s;
-            }
-
-            .feedback-widget-button:hover {
-              background: #4338ca;
-            }
-
-            .feedback-widget-input {
-              width: 100%;
-              padding: 8px;
-              margin-bottom: 12px;
-              border: 1px solid #e5e7eb;
-              border-radius: 4px;
-              background: \${this.config?.theme === 'dark' ? '#374151' : '#ffffff'};
-              color: \${this.config?.theme === 'dark' ? '#ffffff' : '#000000'};
-            }
           \`;
 
           const styleSheet = document.createElement('style');
           styleSheet.textContent = styles;
           document.head.appendChild(styleSheet);
+          console.log('Styles injected successfully'); // Debug log
         }
 
         render() {
+          console.log('Rendering widget button'); // Debug log
           this.widgetElement = document.createElement('div');
           this.widgetElement.className = 'feedback-widget-trigger';
           this.widgetElement.innerHTML = \`
             <button 
               class="feedback-widget-button"
               onclick="window.FeedbackWidget.openModal()"
+              style="background: #4f46e5; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;"
             >
-              Give Feedback
+              \${this.config?.button_text || 'Give Feedback'}
             </button>
           \`;
           document.body.appendChild(this.widgetElement);
+          console.log('Widget button rendered'); // Debug log
         }
 
         openModal() {
@@ -318,6 +307,7 @@ export async function GET() {
 
       // Initialize widget and attempt to retry stored feedback
       window.FeedbackWidget = new FeedbackWidget();
+      console.log('FeedbackWidget added to window object'); // Debug log
       window.addEventListener('online', () => {
         window.FeedbackWidget.retryStoredFeedback();
       });
