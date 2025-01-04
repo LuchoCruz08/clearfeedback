@@ -69,10 +69,13 @@ interface SearchParams {
   [key: string]: string | string[] | undefined;
 }
 
+type Params = Promise<{ id: string }>;
+
 interface PageProps {
-  params: { id: string }; // Ensure this matches the expected format
+  params: Params; // Use the promised params type
   searchParams?: Record<string, string | string[] | undefined>;
 }
+
 
 export default function ProjectDetailsPage({ params }: PageProps) {
   const [project, setProject] = useState<Project | null>(null);
@@ -100,7 +103,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", (await params).id)
         .single();
 
       if (error) throw error;
@@ -120,7 +123,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data, error } = await supabase
         .from("feedback")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", (await params).id)
         .order("submitted_at", { ascending: false });
 
       if (error) throw error;
@@ -141,7 +144,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { data: widget, error } = await supabase
         .from("widget")
         .select("*")
-        .eq("business_id", params.id)
+        .eq("business_id", (await params).id)
         .maybeSingle();
 
       if (error && error.code !== "PGRST116") throw error;
@@ -156,7 +159,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
       const { error } = await supabase
         .from("businesses")
         .delete()
-        .eq("id", params.id);
+        .eq("id", (await params).id);
 
       if (error) throw error;
 
@@ -211,7 +214,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
     script.src = '${process.env.NEXT_PUBLIC_APP_URL}/api/widget';
     script.async = true;
     script.onload = function() {
-      window.FeedbackWidget.init('${params.id}');
+      window.FeedbackWidget.init('${(await params).id}');
     };
     document.head.appendChild(script);
   })();
