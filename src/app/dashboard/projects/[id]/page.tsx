@@ -70,7 +70,7 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: { id: string }; // Adjust to match Next.js expectations
+  params: { id: string }; // Ensure this matches the expected format
   searchParams?: Record<string, string | string[] | undefined>;
 }
 
