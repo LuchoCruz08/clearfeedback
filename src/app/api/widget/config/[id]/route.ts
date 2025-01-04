@@ -2,9 +2,16 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+// Update the type definition for params
+type RouteParams = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
     const supabase = await createClient();
@@ -27,7 +34,7 @@ export async function GET(
         questions: [],
         show_emoji: true,
         show_rating: true,
-        rating_scale: 5,
+        rating_scale: 0,
         button_text: "Give Feedback",
         title_text: "Share Your Feedback",
       });
