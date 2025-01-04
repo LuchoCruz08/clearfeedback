@@ -2,9 +2,15 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+interface RouteContext {
+  params: {
+    id: string;
+  };
+}
+
 export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
+  req: NextRequest,
+  { params }: RouteContext
 ) {
   try {
     const supabase = await createClient();
@@ -13,13 +19,13 @@ export async function GET(
     const { data: widget, error } = await supabase
       .from("widget")
       .select("*")
-      .eq("business_id", context.params.id)
+      .eq("business_id", params.id)
       .maybeSingle();
 
     // If no widget exists, return default configuration
     if (!widget) {
       return NextResponse.json({
-        business_id: context.params.id,
+        business_id: params.id,
         position: "bottom-right",
         theme: "light",
         custom_css: "",
