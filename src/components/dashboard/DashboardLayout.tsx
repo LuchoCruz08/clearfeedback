@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen">
       {/* Background gradient */}
       <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-      
+
       <div className="flex h-screen">
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -21,4 +21,4 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
     </div>
   );
-} 
+}
